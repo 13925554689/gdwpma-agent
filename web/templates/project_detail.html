@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>{{ p.name }} <span class="muted big">（{{ p.county }}）</span></h2>
+<p class="muted">{{ p.owner_unit or '—' }}｜{{ p.category or '—' }}｜总投资 {{ '%.2f'|format(p.total_invest or 0) }} 万元｜申请债券 {{ '%.2f'|format(p.bond_amount or 0) }} 万元｜期限 {{ p.term_years or '—' }} 年｜利率 {{ p.rate or '—' }}%｜年均收入 {{ '%.2f'|format(p.annual_income or 0) }} 万元｜状态 <span class="tag st">{{ p.status }}</span></p>
+
+<div class="panel">
+<h3>收益覆盖倍数：{% if cov %}<span class="tag {{ 'ok' if cov>=1.5 else ('P1' if cov>=1.2 else 'P0') }}">{{ '%.2f'|format(cov) }}</span>{% else %}—（缺收入/债券数据）{% endif %}</h3>
+</div>
+
+<div class="panel">
+<h3>必备材料核对（一案两书 + 前期要件）</h3>
+<table>
+<tr><th>材料</th><th>状态</th><th>备注</th></tr>
+{% for t, ok in checklist %}
+<tr><td>{{ t }}</td><td>{% if ok %}<span class="tag ok">已登记</span>{% else %}<span class="tag P0">缺失</span>{% endif %}</td><td></td></tr>
+{% endfor %}
+</table>
+<form method="post" action="/api/docs" enctype="multipart/form-data" class="inline">
+  <input type="hidden" name="project_id" value="{{ p.id }}">
+  <select name="doc_type">{% for t in doc_types %}<option>{{ t }}</option>{% endfor %}</select>
+  <input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.md,.jpg,.png" style="max-width:220px">
+  <input name="note" placeholder="备注（文号/日期）" style="width:160px">
+  <button class="btn green" type="submit">登记材料</button>
+  <span class="kw">PDF/txt/md 自动抽取全文；扫描件登记后点"OCR识别"</span>
+</form>
+{% if docs %}
+<table>
+<tr><th>已登记材料</th><th>文件</th><th>备注</th><th>时间</th></tr>
+{% for d in docs %}<tr><td>{{ d.doc_type }}</td>
+<td>{% if d.file_path %}<span class="kw">📄 已上传</span>
+<button class="btn sm gray" onclick="ocrDoc({{ d.id }}, this)">OCR识别</button>
+{% if d.extracted_text %}<span class="tag ok">已抽取</span>{% endif %}{% else %}—{% endif %}</td>
+<td class="kw">{{ d.note or '' }}</td><td class="kw">{{ d.uploaded_at }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+</div>
+
+<div class="panel">
+<h3>还本付息台账</h3>
+{% if rp %}
+<table>
+<tr><th>批次</th><th>到期日</th><th>本金(万)</th><th>利息(万)</th><th>已偿(万)</th><th>收入归集(万)</th></tr>
+{% for r in rp %}<tr><td>{{ r.bond_batch }}</td><td>{{ r.due_date }}</td><td>{{ '%.2f'|format(r.principal) }}</td><td>{{ '%.2f'|format(r.interest) }}</td><td>{{ '%.2f'|format(r.paid) }}</td><td>{{ '%.2f'|format(r.income_recv) }}</td></tr>{% endfor %}
+</table>
+{% else %}<p class="muted">暂无偿债记录。</p>{% endif %}
+<form method="post" action="/api/repayments" class="inline">
+  <input type="hidden" name="project_id" value="{{ p.id }}">
+  <input name="bond_batch" placeholder="批次" style="width:80px">
+  <input name="due_date" type="date">
+  <input name="principal" type="number" step="0.01" placeholder="本金" style="width:90px">
+  <input name="interest" type="number" step="0.01" placeholder="利息" style="width:90px">
+  <input name="paid" type="number" step="0.01" placeholder="已偿" style="width:90px">
+  <input name="income_recv" type="number" step="0.01" placeholder="收入归集" style="width:100px">
+  <button class="btn" type="submit">登记</button>
+</form>
+</div>
+
+<div class="panel">
+<h3>审核历史</h3>
+{% if revs %}
+<table>
+<tr><th>批次</th><th>环节</th><th>审核人</th><th>时间</th><th>摘要</th><th></th></tr>
+{% for r in revs %}<tr><td>#{{ r.id }}</td><td>{{ r.stage }}</td><td>{{ r.reviewer }}</td><td class="kw">{{ r.reviewed_at }}</td><td>{{ r.summary or '' }}</td><td><a class="btn sm gray" href="/review/{{ r.id }}">查看</a></td></tr>{% endfor %}
+</table>
+{% else %}<p class="muted">尚未审核。</p>{% endif %}
+</div>
+
+<div class="panel">
+<h3>问题与整改</h3>
+{% if fds %}
+<table>
+<tr><th>规则</th><th>级别</th><th>状态</th><th>描述</th></tr>
+{% for f in fds %}<tr><td>{{ f.rule_no }}</td><td><span class="tag {{ f.severity }}">{{ f.severity }}</span></td><td><span class="tag st">{{ f.status }}</span></td><td>{{ f.rule_name }}：{{ f.description[:80] }}</td></tr>{% endfor %}
+</table>
+{% else %}<p class="muted">暂无问题记录。</p>{% endif %}
+</div>
+<script>
+async function ocrDoc(id, btn){
+  btn.disabled = true; btn.textContent = '识别中…';
+  const fd = new FormData();
+  const r = await fetch('/api/docs/' + id + '/ocr', {method:'POST', body:fd});
+  const j = await r.json();
+  if(j.chars !== undefined){ btn.textContent = '✓' + j.chars + '字'; }
+  else { btn.textContent = '失败'; alert(j.error); }
+}
+</script>
+{% endblock %}

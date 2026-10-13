@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>问题台账（分县市 · 整改闭环）</h2>
+<form method="get" class="inline" style="margin-bottom:10px">
+  <select name="county"><option value="">全部县市</option>
+    {% for ct in counties %}<option value="{{ ct }}" {{ 'selected' if county==ct }}>{{ ct }}</option>{% endfor %}</select>
+  <select name="status"><option value="">全部状态</option>
+    {% for s in statuses %}<option {{ 'selected' if status==s }}>{{ s }}</option>{% endfor %}</select>
+  <button class="btn" type="submit">筛选</button>
+</form>
+
+<div class="panel">
+<h3>分县市问题分布</h3>
+<table>
+<tr><th>县市</th><th>问题数</th><th>其中 P0</th></tr>
+{% for r in by_county %}
+<tr><td>{{ r.county }}</td><td>{{ r.n }}</td><td>{{ r.p0 or 0 }}</td></tr>
+{% else %}<tr><td colspan="3" class="muted">暂无问题数据。</td></tr>{% endfor %}
+</table>
+</div>
+
+<table>
+<tr><th>县市</th><th>项目</th><th>规则</th><th>级别</th><th>描述</th><th>状态</th><th>整改计划</th><th>整改结果</th><th>复核</th></tr>
+{% for f in rows %}
+<tr>
+  <td>{{ f.county }}</td><td>{{ f.proj }}</td>
+  <td>{{ f.rule_no }}<br><span class="kw">{{ f.rule_name }}</span></td>
+  <td><span class="tag {{ f.severity }}">{{ f.severity }}</span></td>
+  <td>{{ f.description[:70] }}</td>
+  <td><span class="tag st">{{ f.status }}</span></td>
+  <td class="kw">{{ f.plan or '—' }} {{ f.due_date or '' }}</td>
+  <td class="kw">{{ f.result or '—' }}</td>
+  <td class="kw">{{ f.recheck_note or '—' }}</td>
+</tr>
+{% else %}<tr><td colspan="9" class="muted">暂无问题。</td></tr>{% endfor %}
+</table>
+{% endblock %}

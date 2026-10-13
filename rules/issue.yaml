@@ -1,0 +1,87 @@
+# 发：发行管理审核规则（依据：财库〔2020〕36号《地方政府债券发行管理办法》、预算法、债务信息公开办法、国办发〔2024〕52号）
+rules:
+  - "no": IS-001
+    name: 额度与预算程序未完成
+    severity: P0
+    clause: 预算法第43-45条；国办发〔2024〕52号(九)
+    check: 债券额度已下达，同级人大常委会预算调整程序已履行，方可发行。
+    evidence: [额度下达文件, 人大常委会批准文件]
+  - "no": IS-002
+    name: 发行前信息披露不足5个工作日
+    severity: P1
+    clause: 《地方政府债务信息公开办法（试行）》第八条
+    check: 新增专项债券发行前提前5个以上工作日公开法定信息。
+    evidence: [信息披露记录]
+  - "no": IS-003
+    name: 信用评级报告无效
+    severity: P0
+    clause: 财库〔2020〕36号第三章
+    check: 评级机构具备资质、评级协议已签、评级报告在有效期内且结论明确。
+    evidence: [信用评级报告]
+  - "no": IS-004
+    name: 期限结构不均衡
+    severity: P1
+    clause: 国办发〔2024〕52号(九)
+    check: 综合建设运营周期、到期分布确定期限，均衡分年到期债务规模。
+    evidence: [发行计划]
+  - "no": IS-005
+    name: 发行利差异常
+    severity: P1
+    clause: 财库〔2020〕36号；市场化定价要求
+    check: 发行利率与同期限国债利差处于合理区间，异常偏低须说明定价依据。
+    evidence: [发行结果公告]
+  - "no": IS-006
+    name: 专户管理约定缺失
+    severity: P0
+    clause: 国办发〔2024〕52号(十一)
+    check: 债券资金实行专户管理、专款专用，专户开立与监管约定文件齐备。
+    evidence: [专户协议]
+  - "no": IS-007
+    name: 发行规模超出审核通过规模
+    severity: P1
+    clause: 国办发〔2024〕52号(七)(八)
+    check: 实际发行规模不得超过申报审核通过及省级批准的规模。
+    evidence: [审核结果, 省级批准文件]
+    auto: "approved_scale > 0 and bond_amount > approved_scale"
+  - "no": IS-008
+    name: 发行文件与申报材料不一致
+    severity: P2
+    clause: 财库〔2020〕36号
+    check: 募集文件、项目信息与申报审核材料一致，变更事项已重新履行程序。
+    evidence: [发行文件, 申报材料]
+  - "no": IS-009
+    name: 再融资债券用途不明
+    severity: P1
+    clause: 财库〔2020〕36号
+    check: 再融资债券须明确用于偿还到期债券本金，不得挪作新增支出。
+    evidence: [再融资发行文件]
+  - "no": IS-010
+    name: 承销机构资质瑕疵
+    severity: P2
+    clause: 财库〔2020〕36号
+    check: 承销团成员符合金融机构承销资质要求。
+    evidence: [承销团文件]
+  - "no": IS-011
+    name: 发行迟延
+    severity: P1
+    clause: 国办发〔2024〕52号(九)
+    check: 额度下达后应及时履行程序安排发行，做到早发行、早使用。
+    evidence: [额度下达文件, 发行公告]
+  - "no": IS-012
+    name: 项目重大变更未重审
+    severity: P0
+    clause: 国办发〔2024〕52号(七)
+    check: 发行前项目实施内容、实施主体发生重大变更的，须重新履行审核程序。
+    evidence: [变更批复]
+  - "no": IS-013
+    name: 集合发行项目明细不清
+    severity: P2
+    clause: 财库〔2020〕36号第九条
+    check: 对应多个项目集合发行的，须列明各项目金额、收益与平衡安排明细。
+    evidence: [发行文件]
+  - "no": IS-014
+    name: 偿债备付金制度未建立
+    severity: P1
+    clause: 国办发〔2024〕52号(五)
+    check: 已建立专项债券偿债备付金制度并有计提安排。
+    evidence: [备付金制度文件, 备付金账户流水]

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>用户管理 / 改密</h2>
+{% if msg %}<p class="pill">{{ msg }}</p>{% endif %}
+
+<div class="panel">
+<h3>用户列表</h3>
+<table>
+<tr><th>用户名</th><th>角色</th><th>创建时间</th><th>操作</th></tr>
+{% for u in rows %}
+<tr>
+  <td>{{ u.username }}</td><td>{{ u.role }}</td><td class="kw">{{ u.created_at }}</td>
+  <td>
+    {% if uname == u.username %}
+    <form method="post" action="/api/me/password" class="inline">
+      <input name="old" type="password" placeholder="旧密码" required style="width:100px">
+      <input name="new" type="password" placeholder="新密码" required style="width:100px">
+      <button class="btn sm" type="submit">改自己的密码</button>
+    </form>
+    {% elif session.get('role')=='管理员' and u.username!='admin' %}
+    <form method="post" action="/api/users/reset_pw" class="inline" style="margin-bottom:3px">
+      <input type="hidden" name="username" value="{{ u.username }}">
+      <input name="password" placeholder="新密码" required style="width:110px">
+      <button class="btn sm" type="submit">重置密码</button>
+    </form>
+    <form method="post" action="/api/users/del" class="inline">
+      <input type="hidden" name="username" value="{{ u.username }}">
+      <button class="btn sm red" type="submit">删除</button>
+    </form>
+    {% endif %}
+  </td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+{% if session.get('role')=='管理员' %}
+<div class="panel">
+<h3>添加用户</h3>
+<form method="post" action="/api/users/add" class="inline">
+  <input name="username" placeholder="用户名" required>
+  <input name="password" type="password" placeholder="密码" required>
+  <select name="role"><option>审核员</option><option>管理员</option></select>
+  <button class="btn" type="submit">添加</button>
+</form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>审核工作台（借 / 发 / 用 / 还 全环节）</h2>
+<div class="panel">
+<h3>发起审核</h3>
+<form method="post" action="/api/review/run" class="inline">
+  <select name="project_id" required>
+    <option value="">选择项目…</option>
+    {% for p in projs %}<option value="{{ p.id }}">{{ p.county }}｜{{ p.name }}</option>{% endfor %}
+  </select>
+  <select name="stage">{% for s in stages %}<option>{{ s }}</option>{% endfor %}</select>
+  <input name="reviewer" placeholder="审核人" style="width:110px">
+  <button class="btn" type="submit">执行审核</button>
+</form>
+<p class="muted" style="margin-top:8px">自动检查项：收益覆盖倍数、申请规模与额度、材料齐备性、负面清单关键词；其余为人工判定规则项（须上传/指定证据材料后逐条确认）。</p>
+</div>
+
+{% if projs %}
+<table>
+<tr><th>项目</th><th>县市</th><th>状态</th><th></th></tr>
+{% for p in projs %}
+<tr><td>{{ p.name }}</td><td>{{ p.county }}</td><td><span class="tag st">{{ p.status }}</span></td>
+<td><a class="btn sm gray" href="/projects/{{ p.id }}">项目详情</a></td></tr>
+{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

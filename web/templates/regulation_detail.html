@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>{{ reg.title }}</h2>
+<p class="muted">
+  层级：<span class="pill">{{ reg.level }}</span>
+  地区：{{ reg.region }}｜文号：{{ reg.doc_no or '—' }}｜发布：{{ reg.issue_date or '—' }}｜状态：<span class="tag {{ 'ok' if reg.status=='现行有效' else 'st' }}">{{ reg.status }}</span>
+</p>
+<p class="kw">{{ reg.keywords }}</p>
+<div class="panel"><pre>{{ reg.content }}</pre></div>
+{% endblock %}

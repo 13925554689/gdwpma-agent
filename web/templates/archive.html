@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>底稿归档（全过程留痕 · 项目结束立卷）</h2>
+<div class="panel">
+<h3>按项目立卷归档</h3>
+<p class="muted">每个管理动作（建档/材料登记/审核/报告/整改/复核/还本付息）自动写入底稿；立卷时按项目打包全部底稿+报告+附件，生成卷内目录。</p>
+</div>
+<table>
+<tr><th>项目</th><th>县市</th><th>底稿条数</th><th>问题条数</th><th></th></tr>
+{% for r in rows %}
+<tr>
+  <td>{{ r.name }}</td><td>{{ r.county }}</td><td>{{ r.wp_cnt }}</td><td>{{ r.fd_cnt }}</td>
+  <td>
+    <button class="btn sm" onclick="archive({{ r.id }}, this)">立卷归档</button>
+    <a class="btn sm gray" href="/projects/{{ r.id }}">详情</a>
+  </td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="panel">
+<h3>已生成归档卷</h3>
+{% if arcs %}
+<ul>{% for a in arcs %}<li><span class="kw">{{ a }}</span></li>{% endfor %}</ul>
+{% else %}<p class="muted">暂无归档卷。</p>{% endif %}
+</div>
+
+<script>
+async function archive(pid, btn){
+  btn.disabled = true;
+  const r = await fetch('/api/archive/' + pid, {method:'POST'});
+  const j = await r.json();
+  btn.outerHTML = '<span class="tag ok">已立卷</span>';
+  alert('归档完成：' + j.archive_dir);
+}
+</script>
+{% endblock %}

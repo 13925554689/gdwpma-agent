@@ -1,0 +1,70 @@
+# 还：收入归集与偿还审核规则（依据：国办发〔2024〕52号(四)(五)、审计署实证、财预〔2021〕175号）
+rules:
+  - "no": RP-001
+    name: 项目收入未及时收缴
+    severity: P1
+    clause: 国办发〔2024〕52号(五)抓好项目收入征缴
+    check: 项目运营收入按方案归集，未及时收缴须催缴并说明原因。
+    evidence: [收入台账, 缴库凭证]
+    auto: "income_recv < expected_income * 0.8"
+  - "no": RP-002
+    name: 收益挪用平衡其他预算
+    severity: P0
+    clause: 国办发〔2024〕52号(四)
+    check: 项目专项收入不得挪用于平衡其他项目或一般预算。
+    evidence: [专户流水]
+    audit_source: 审计署：10.56亿元项目收益被挪用于平衡预算
+  - "no": RP-003
+    name: 备付金未计提或不足
+    severity: P1
+    clause: 国办发〔2024〕52号(五)偿债备付金制度
+    check: 按制度计提偿债备付金，到期前备付金覆盖当期本息。
+    evidence: [备付金账户流水]
+    auto: "reserve < due_amount"
+  - "no": RP-004
+    name: 到期本息偿付风险
+    severity: P0
+    clause: 国办发〔2024〕52号(四)省级兜底责任
+    check: 到期前6个月启动偿债资金筹措，防逾期。
+    evidence: [还款计划, 备付金流水]
+    auto: "days_to_due < 180 and funds_arranged < due_amount"
+  - "no": RP-005
+    name: 收益低于预期
+    severity: P1
+    clause: 财预〔2021〕61号绩效管理
+    check: 实际收益与预期收益偏差大时启动解决方案（财政补助、调剂收入、盘活资产）。
+    evidence: [收入台账, 融资平衡方案]
+    audit_source: 江苏275个项目近3年收益未达预期，255个不足预期50%，涉及本金508.52亿
+    auto: "actual_income < expected_income * 0.5"
+  - "no": RP-006
+    name: 资产未登记
+    severity: P1
+    clause: 国办发〔2024〕52号资产管理
+    check: 债券资金形成的资产全部登记入账，与投资表勾稽一致。
+    evidence: [资产台账, 投资表]
+    audit_source: 审计署2024：25县少登记485个项目资产663.75亿元
+  - "no": RP-007
+    name: 违规抵押融资
+    severity: P0
+    clause: 预算法；国发〔2014〕43号
+    check: 专项债券项目资产不得违规抵押融资。
+    evidence: [资产台账, 抵押登记查询]
+  - "no": RP-008
+    name: 提前偿还安排不合规
+    severity: P2
+    clause: 国办发〔2024〕52号(五)
+    check: 收入较好项目提前偿还本金的，履行规定程序。
+    evidence: [提前偿还批准文件]
+  - "no": RP-009
+    name: 区域平衡方案未落实
+    severity: P1
+    clause: 国办发〔2024〕52号(四)
+    check: 省内市县区域平衡与财政补助安排按方案落实。
+    evidence: [平衡方案, 预算安排文件]
+  - "no": RP-010
+    name: 虚假化债迹象
+    severity: P0
+    clause: 国办发〔2024〕52号(六)监督问责；审计署2025报告
+    check: 化债台账真实，无修改台账、债务转企业、以新还旧、违规举新还旧等虚假化债情形。
+    evidence: [化债台账, 银行流水]
+    audit_source: 审计署2025：抽查发现虚假化债23.2亿元，9家平台不符合条件虚假退出

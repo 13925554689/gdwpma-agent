@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>政府债法规库（国家 / 省 / 市县 三级）</h2>
+<form method="get" class="inline" style="margin-bottom:12px">
+  <input type="text" name="q" value="{{ q }}" placeholder="全文检索：如 专项债券 负面清单 覆盖倍数" style="width:340px">
+  <select name="level">
+    <option value="">全部层级</option>
+    {% for lv in levels %}<option value="{{ lv }}" {{ 'selected' if level==lv }}>{{ lv }}</option>{% endfor %}
+  </select>
+  <button class="btn" type="submit">检索</button>
+  <span class="muted">共 {{ rows|length }} 条结果</span>
+</form>
+
+<table>
+<tr><th style="width:64px">层级</th><th>法规名称</th><th>文号</th><th>状态</th><th>命中片段</th></tr>
+{% for r in rows %}
+<tr>
+  <td><span class="pill">{{ r.level }}</span></td>
+  <td><a href="/regulations/{{ r.id }}">{{ r.title }}</a></td>
+  <td class="kw">{{ r.doc_no or '—' }}</td>
+  <td><span class="tag {{ 'ok' if r.status=='现行有效' else 'st' }}">{{ r.status }}</span></td>
+  <td class="kw">{{ r.snip|safe }}</td>
+</tr>
+{% else %}<tr><td colspan="5" class="muted">无结果。</td></tr>{% endfor %}
+</table>
+{% endblock %}

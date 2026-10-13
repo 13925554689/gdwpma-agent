@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>审核结果 #{{ rv.id }} · {{ p.name }} · {{ rv.stage }} 环节</h2>
+<p class="muted">审核人：{{ rv.reviewer }}｜时间：{{ rv.reviewed_at }}｜摘要：{{ rv.summary or '—' }}</p>
+
+{% if fds %}
+<table>
+<tr><th>规则</th><th>级别</th><th>依据条款</th><th>问题描述</th><th>证据材料</th><th>状态</th><th>整改操作</th></tr>
+{% for f in fds %}
+<tr>
+  <td>{{ f.rule_no }}<br><span class="kw">{{ f.rule_name }}</span></td>
+  <td><span class="tag {{ f.severity }}">{{ f.severity }}</span></td>
+  <td class="kw">{{ f.clause }}</td>
+  <td>{{ f.description }}</td>
+  <td class="kw">{{ f.evidence or '—' }}</td>
+  <td><span class="tag st">{{ f.status }}</span></td>
+  <td>
+    <form method="post" action="/api/rectify" style="margin-bottom:4px">
+      <input type="hidden" name="finding_id" value="{{ f.id }}">
+      <input type="hidden" name="action" value="plan">
+      <input name="plan" placeholder="整改计划" style="width:130px" required>
+      <input name="due_date" type="date">
+      <button class="btn sm" type="submit">提交计划</button>
+    </form>
+    <form method="post" action="/api/rectify" style="margin-bottom:4px">
+      <input type="hidden" name="finding_id" value="{{ f.id }}">
+      <input type="hidden" name="action" value="result">
+      <input name="result" placeholder="整改结果" style="width:130px" required>
+      <button class="btn sm green" type="submit">提交结果</button>
+    </form>
+    <form method="post" action="/api/rectify">
+      <input type="hidden" name="finding_id" value="{{ f.id }}">
+      <input type="hidden" name="action" value="recheck">
+      <input name="recheck_note" placeholder="复核意见" style="width:130px">
+      <button class="btn sm green" name="ok" value="1" type="submit">复核通过</button>
+      <button class="btn sm red" name="ok" value="0" type="submit">退回</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="panel">
+<h3>生成分县市审核报告</h3>
+<button class="btn" onclick="genReport({{ rv.id }})">生成报告（MD+DOCX）</button>
+<button class="btn gray" onclick="aiComment({{ rv.id }})">AI 点评（辅助）</button>
+<button class="btn gray" onclick="toPdf()">转 PDF</button>
+<span id="report_out" class="muted"></span>
+<pre id="ai_out" style="display:none"></pre>
+</div>
+<script>
+async function genReport(rid){
+  const fd = new FormData(); fd.append('review_id', rid);
+  const r = await fetch('/api/review/report', {method:'POST', body:fd});
+  const j = await r.json();
+  _docx = (j.docx_path && j.docx_path.endsWith('.docx')) ? j.docx_path : null;
+  document.getElementById('report_out').innerHTML = '结论：<b>' + j.conclusion + '</b>　报告：<a href="file:///' + j.report_path.replace(/\\\\/g,'/') + '">' + j.report_path + '</a>　DOCX：' + (j.docx_path && !j.docx_path.startsWith('docx转换失败') ? '<a href="file:///' + j.docx_path.replace(/\\\\/g,'/') + '">' + j.docx_path + '</a>' : j.docx_path);
+}
+let _docx = null;
+async function toPdf(){
+  if(!_docx){ alert('请先生成报告'); return; }
+  const fd = new FormData(); fd.append('docx_path', _docx);
+  const r = await fetch('/api/review/pdf', {method:'POST', body:fd});
+  const j = await r.json();
+  if(j.pdf_path) document.getElementById('report_out').innerHTML += '　PDF：<a href="file:///' + j.pdf_path.replace(/\\\\/g,'/') + '">' + j.pdf_path + '</a>';
+  else alert(j.error);
+}
+async function aiComment(rid){
+  const fd = new FormData(); fd.append('review_id', rid);
+  const r = await fetch('/api/review/ai_comment', {method:'POST', body:fd});
+  const j = await r.json();
+  const el = document.getElementById('ai_out');
+  el.style.display = 'block';
+  el.textContent = '【AI 点评·辅助，判定以规则引擎与人工为准】\n' + j.comment;
+}
+</script>
+{% else %}
+<p class="muted">本批次未命中问题。</p>
+{% endif %}
+{% endblock %}

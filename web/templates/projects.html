@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>项目库（全生命周期台账）</h2>
+<div class="panel">
+<h3>新增项目建档</h3>
+<form method="post" action="/api/projects" class="inline">
+  <input name="county" placeholder="县市*" required style="width:90px">
+  <input name="name" placeholder="项目名称*" required style="width:220px">
+  <input name="category" placeholder="项目类别（如 棚户区改造）" style="width:150px">
+  <select name="project_type"><option>新增专项债券</option><option>一般债券</option><option>再融资债券</option></select>
+  <input name="total_invest" type="number" step="0.01" placeholder="总投资(万元)" style="width:110px">
+  <input name="bond_amount" type="number" step="0.01" placeholder="申请债券(万元)" style="width:120px">
+  <input name="term_years" type="number" step="0.1" placeholder="期限(年)" style="width:80px">
+  <input name="rate" type="number" step="0.01" placeholder="利率%" style="width:76px">
+  <input name="annual_income" type="number" step="0.01" placeholder="年均收入(万元)" style="width:120px">
+  <input name="owner_unit" placeholder="项目单位" style="width:130px">
+  <input name="limit_remaining" type="number" step="0.01" placeholder="剩余额度" style="width:90px">
+  <button class="btn" type="submit">建档</button>
+</form>
+</div>
+
+<table>
+<tr><th>ID</th><th>县市</th><th>项目名称</th><th>类别</th><th>类型</th><th>债券(万元)</th><th>状态</th><th></th></tr>
+{% for p in rows %}
+<tr>
+  <td>{{ p.id }}</td><td>{{ p.county }}</td>
+  <td><a href="/projects/{{ p.id }}">{{ p.name }}</a></td>
+  <td>{{ p.category or '—' }}</td><td>{{ p.project_type }}</td>
+  <td>{{ '%.2f'|format(p.bond_amount or 0) }}</td>
+  <td><span class="tag st">{{ p.status }}</span></td>
+  <td><a class="btn sm" href="/projects/{{ p.id }}">详情</a></td>
+</tr>
+{% else %}<tr><td colspan="8" class="muted">暂无项目。</td></tr>{% endfor %}
+</table>
+{% endblock %}

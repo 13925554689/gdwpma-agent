@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GDWPMA-AI · 政府债全过程管理智能体</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1c2733;--muted:#68788c;--line:#e3e9f0;--brand:#1a5fb4;--brand2:#26a269;--warn:#c01c28;--amber:#b58100}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:linear-gradient(90deg,#123c6b,#1a5fb4);color:#fff;padding:0 24px;display:flex;align-items:center;gap:32px;height:52px}
+header .logo{font-weight:700;font-size:16px;letter-spacing:1px}
+header nav a{color:#cfe0f5;text-decoration:none;margin-right:18px;line-height:52px;display:inline-block}
+header nav a.on{color:#fff;border-bottom:3px solid #ffd166;font-weight:600}
+main{max-width:1200px;margin:20px auto 60px;padding:0 16px}
+h2{font-size:18px;margin:6px 0 14px}
+h3{font-size:15px;margin:14px 0 8px}
+.cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:150px}
+.card .k{color:var(--muted);font-size:12px}
+.card .v{font-size:26px;font-weight:700;color:var(--brand)}
+.card .v.red{color:var(--warn)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+th{background:#eef3f9;text-align:left;font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.tag.P0{background:#fde5e7;color:var(--warn)}
+.tag.P1{background:#fbf0d9;color:var(--amber)}
+.tag.P2{background:#e2eff9;color:var(--brand)}
+.tag.ok{background:#e3f2e9;color:var(--brand2)}
+.tag.st{background:#eceff3;color:var(--muted)}
+.btn{display:inline-block;background:var(--brand);color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;text-decoration:none}
+.btn.gray{background:#8d99a8}.btn.green{background:var(--brand2)}.btn.red{background:var(--warn)}
+.btn.sm{padding:2px 10px;font-size:12px}
+form.inline{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+input,select,textarea{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:inherit}
+textarea{width:100%;min-height:56px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.muted{color:var(--muted)}
+.big{font-size:15px}
+.pill{display:inline-block;background:#eef3f9;border-radius:12px;padding:2px 10px;margin:2px;font-size:12px}
+a{color:var(--brand)}
+.kw{color:var(--muted);font-size:12px}
+pre{white-space:pre-wrap;background:#f7f9fb;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">GDWPMA-AI</span>
+  <nav>
+    {% for label, href in nav %}<a href="{{ href }}" class="{{ 'on' if request.path==href or (href!='/' and request.path.startswith(href)) else '' }}">{{ label }}</a>{% endfor %}
+  </nav>
+  <span style="margin-left:auto" class="kw">{% if uname %}{{ uname }} · <a href="/logout" style="color:#cfe0f5">退出</a>{% else %}<a href="/login" style="color:#cfe0f5">登录</a>{% endif %}</span>
+</header>
+<main>
+{% block body %}{% endblock %}
+</main>
+</body>
+</html>

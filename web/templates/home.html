@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>政府债全过程管理总览</h2>
+<div class="cards">
+  <div class="card"><div class="k">法规库</div><div class="v">{{ stats.reg_cnt }}</div></div>
+  <div class="card"><div class="k">项目</div><div class="v">{{ stats.proj_cnt }}</div></div>
+  <div class="card"><div class="k">审核批次</div><div class="v">{{ stats.review_cnt }}</div></div>
+  <div class="card"><div class="k">问题总数</div><div class="v">{{ stats.find_cnt }}</div></div>
+  <div class="card"><div class="k">未闭环问题</div><div class="v {{ 'red' if stats.open_find else '' }}">{{ stats.open_find }}</div></div>
+  <div class="card"><div class="k">未闭环 P0</div><div class="v {{ 'red' if stats.p0 else '' }}">{{ stats.p0 }}</div></div>
+</div>
+
+<div class="panel">
+<h3>分县市项目分布</h3>
+<table>
+<tr><th>县市</th><th>项目数</th><th>债券金额（万元）</th></tr>
+{% for r in by_county %}
+<tr><td>{{ r.county }}</td><td>{{ r.n }}</td><td>{{ '%.2f'|format(r.amt or 0) }}</td></tr>
+{% else %}<tr><td colspan="3" class="muted">暂无项目，前往 <a href="/projects">项目库</a> 建档。</td></tr>{% endfor %}
+</table>
+</div>
+
+<div class="panel">
+<h3>问题严重度分布</h3>
+<p>
+<span class="pill">P0 否决：{{ sev.get('P0',0) }}</span>
+<span class="pill">P1 限期补正：{{ sev.get('P1',0) }}</span>
+<span class="pill">P2 提示：{{ sev.get('P2',0) }}</span>
+</p>
+</div>
+
+<div class="panel">
+<h3>全过程底稿（最近 10 条）</h3>
+<table>
+<tr><th>时间</th><th>项目</th><th>环节</th><th>动作</th><th>内容</th></tr>
+{% for w in recent %}
+<tr><td class="kw">{{ w.created_at }}</td><td>{{ w.proj or '—' }}</td><td>{{ w.stage }}</td><td>{{ w.action }}</td><td>{{ w.content }}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">暂无底稿记录。</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

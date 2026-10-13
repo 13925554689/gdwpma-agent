@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>培训辅导（高频问题 · 政策问答 · 案例警示）</h2>
+
+<div class="panel">
+<h3>法规政策问答（GLM-5.3-flash × 法规库 RAG）</h3>
+<form method="post" action="/training" class="inline">
+  <input type="text" name="q" value="{{ q }}" placeholder="如：专项债券用作资本金的比例上限是多少？" style="width:460px">
+  <button class="btn" type="submit">提问</button>
+</form>
+{% if answer %}
+  <p style="margin-top:10px"><span class="pill">{{ answer.mode }}</span> {% if answer.sources %}<span class="kw">依据：{{ answer.sources|join('；') }}</span>{% endif %}</p>
+  <pre>{{ answer.answer }}</pre>
+{% endif %}
+</div>
+
+<div class="panel">
+<h3>高频问题 TOP（来自问题台账自动聚合）</h3>
+<table>
+<tr><th>规则</th><th>级别</th><th>依据条款</th><th>出现次数</th><th>辅导要点</th></tr>
+{% for r in top %}
+<tr>
+  <td>{{ r.rule_no }} {{ r.rule_name }}</td>
+  <td><span class="tag {{ r.severity }}">{{ r.severity }}</span></td>
+  <td class="kw">{{ r.clause }}</td>
+  <td><b>{{ r.n }}</b></td>
+  <td class="kw">{{ r.clause }} → 整改样板见法规库对应条款</td>
+</tr>
+{% else %}<tr><td colspan="5" class="muted">暂无问题数据。完成几次审核后此处自动生成培训要点。</td></tr>{% endfor %}
+</table>
+</div>
+
+<div class="panel">
+<h3>案例警示（源自审计署通报实证）</h3>
+<table>
+<tr><th>模式</th><th>实证</th><th>对应规则</th></tr>
+<tr><td>虚报预期收益包装项目</td><td>17县将69个收益不平衡项目包装获债121.74亿元</td><td>AP-003 / AP-004</td></tr>
+<tr><td>挪用债券资金</td><td>93.17亿元违规用于土地收储、楼堂馆所、企业还贷</td><td>US-001 / US-002</td></tr>
+<tr><td>资金闲置</td><td>吉林158.66亿元闲置（手续不齐59.93亿、内容不明16.81亿等）</td><td>US-003 / AP-005 / AP-010</td></tr>
+<tr><td>超进度拨付</td><td>31个项目48亿元沉淀施工单位</td><td>US-004</td></tr>
+<tr><td>收益未达预期</td><td>江苏255个项目收益不足预期50%，涉及本金508.52亿</td><td>RP-005</td></tr>
+<tr><td>资产少登记</td><td>25县少登记485个项目资产663.75亿元</td><td>RP-006</td></tr>
+<tr><td>虚假化债</td><td>抽查发现虚假化债23.2亿元，9家平台虚假退出</td><td>RP-010</td></tr>
+</table>
+</div>
+{% endblock %}

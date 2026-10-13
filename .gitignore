@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/gdwpma.db*
+data/server.log
+data/outputs/
+.pytest_cache/
+data/uploads/

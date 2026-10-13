@@ -32,7 +32,7 @@ py app.py          # http://127.0.0.1:5210
 
 ```bash
 py -m pytest tests/ -v      # 6 项单测（独立临时库，与服务互不干扰）
-py scripts/e2e.py           # 23 步 HTTP 全流程（服务须运行中；含登录/PDF抽取/docx/AI点评）
+py scripts/e2e.py           # 28 步 HTTP 全流程（服务须运行中；含登录/PDF抽取/docx/AI点评）
 ```
 
 ## 扩展能力（P1+）
@@ -44,5 +44,5 @@ py scripts/e2e.py           # 23 步 HTTP 全流程（服务须运行中；含�
 
 ## 数据
 
-- 法规库：24 部（国家 16 + 省 4 + 市县 4），frontmatter 元数据 + 要点摘编，`data/regulations/*.md`
+- 法规库：24 部（国家 16 + 省 6 + 市县 2），frontmatter 元数据 + 要点摘编，`data/regulations/*.md`
 - 审核报告与归档卷输出：`data/outputs/`

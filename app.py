@@ -90,7 +90,10 @@ def projects():
 @login_required
 def project_detail(pid):
     c = database.conn()
-    p = dict(c.execute("SELECT * FROM projects WHERE id=?", (pid,)).fetchone())
+    p = database.get_project(pid)
+    if p is None:
+        from flask import abort
+        abort(404)
     docs = [dict(r) for r in c.execute("SELECT * FROM project_docs WHERE project_id=? ORDER BY id", (pid,)).fetchall()]
     revs = [dict(r) for r in c.execute("SELECT * FROM reviews WHERE project_id=? ORDER BY id DESC", (pid,)).fetchall()]
     fds = [dict(r) for r in c.execute("SELECT * FROM findings WHERE project_id=? ORDER BY id DESC", (pid,)).fetchall()]
@@ -211,6 +214,9 @@ def api_doc_add():
     fpath, extracted = "", None
     if file and file.filename:
         from werkzeug.utils import secure_filename
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in {".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".md", ".jpg", ".jpeg", ".png"}:
+            return redirect(request.referrer or "/projects")  # ponytail: 白名单外静默拒收，与表单 accept 一致
         fname = f"{pid}_{database.now().replace(':', '').replace(' ', '-')}_{secure_filename(file.filename)}"
         fpath = os.path.join(UPLOAD_DIR, fname)
         file.save(fpath)
@@ -344,8 +350,10 @@ def api_me_password():
 def api_review_pdf():
     """docx -> PDF，Word COM（convert_pdf 同法）；返回 PDF 路径，无 Word/失败给明确错误。"""
     docx_path = request.form.get("docx_path", "")
-    if not docx_path.endswith(".docx") or not os.path.exists(docx_path):
-        return jsonify({"error": "docx 不存在"}), 404
+    allowed_root = os.path.join(database.BASE, "data", "outputs")  # ponytail: 白名单目录，防任意本地 docx 转换
+    if (not docx_path.endswith(".docx") or not os.path.exists(docx_path)
+            or os.path.abspath(docx_path).startswith(os.path.abspath(allowed_root)) is False):
+        return jsonify({"error": "docx 不存在或不在允许目录"}), 404
     pdf_path = os.path.splitext(docx_path)[0] + ".pdf"
     try:
         import pythoncom

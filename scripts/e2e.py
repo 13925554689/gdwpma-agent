@@ -185,5 +185,6 @@ if "pdf_path" in jp:
 else:
     step(f"docx→PDF 降级：{jp.get('error','')[:40]}")
 
+assert len(OK) == 28, f"步数漂移: {len(OK)}"
 print(f"\nALL PASS ({len(OK)} steps)")
 

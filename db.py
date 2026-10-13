@@ -171,3 +171,10 @@ if __name__ == "__main__":
     print("regulations:", c.execute("SELECT COUNT(*) FROM regulations").fetchone()[0])
     print("projects:", c.execute("SELECT COUNT(*) FROM projects").fetchone()[0])
     c.close()
+
+def get_project(pid):
+    """缺 id 返回 None 而非 TypeError（路由层判 None→404）。"""
+    c = conn()
+    r = c.execute("SELECT * FROM projects WHERE id=?", (pid,)).fetchone()
+    c.close()
+    return dict(r) if r else None
